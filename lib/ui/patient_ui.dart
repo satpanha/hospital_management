@@ -2,6 +2,7 @@ import 'dart:io';
 import '../domain/models/patient.dart';
 import '../domain/services/patient_service.dart';
 import '../utils/date_utils.dart';
+import '../utils/io.dart';
 
 class PatientUI {
   final PatientService patientService;
@@ -9,40 +10,53 @@ class PatientUI {
   PatientUI(this.patientService);
 
   void displayPatientMenu() {
-    while (true) {
-      print('\n--- Patient Management ---');
-      print('1. Register New Patient');
-      print('2. Search/View Patient');
-      print('3. Update Patient Details');
-      print('4. View All Patients');
-      print('5. View Patient Appointment History');
-      print('6. Back to Main Menu');
-      stdout.write('Enter your choice: ');
+  while (true) {
+    clearScreen();
+    print('=== Patient Management ===');
+    print('1. Register New Patient');
+    print('2. Search/View Patient');
+    print('3. Update Patient Details');
+    print('4. View All Patients');
+    print('5. View Patient Appointment History');
+    print('6. Back to Main Menu');
+    stdout.write('\nEnter your choice: ');
 
-      final choice = stdin.readLineSync();
-      switch (choice) {
-        case '1':
-          registerNewPatient();
-          break;
-        case '2':
-          searchPatient();
-          break;
-        case '3':
-          updatePatient();
-          break;
-        case '4':
-          listAllPatients();
-          break;
-        case '5':
-          viewAppointmentHistory();
-          break;
-        case '6':
-          return;
-        default:
-          print('Invalid choice.');
-      }
+    final choice = stdin.readLineSync();
+
+    switch (choice) {
+      case '1':
+        clearScreen();
+        registerNewPatient();
+        pause();
+        break;
+      case '2':
+        clearScreen();
+        searchPatient();
+        pause();
+        break;
+      case '3':
+        clearScreen();
+        updatePatient();
+        pause();
+        break;
+      case '4':
+        clearScreen();
+        listAllPatients();
+        pause();
+        break;
+      case '5':
+        clearScreen();
+        viewAppointmentHistory();
+        pause();
+        break;
+      case '6':
+        return;
+      default:
+        print('\nInvalid choice. Please try again.');
+        pause();
     }
   }
+}
 
   void registerNewPatient() {
     print('\n--- Register New Patient ---');

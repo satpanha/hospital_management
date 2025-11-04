@@ -27,8 +27,7 @@ class StaffRepository {
     return dataSource.staff
         .where((s) =>
             s.id.toLowerCase().contains(lowerCaseQuery) ||
-            s.name.toLowerCase().contains(lowerCaseQuery) ||
-            s.department.toLowerCase().contains(lowerCaseQuery))
+            s.name.toLowerCase().contains(lowerCaseQuery))
         .toList();
   }
 

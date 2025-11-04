@@ -1,4 +1,4 @@
-enum AppointmentStatus { Scheduled, Completed, Cancelled, NoShow }
+enum AppointmentStatus { scheduled, completed, cancelled, noShow }
 
 class Appointment {
   final String id;
@@ -12,6 +12,6 @@ class Appointment {
     required this.patientId,
     required this.doctorId,
     required this.dateTime,
-    this.status = AppointmentStatus.Scheduled,
+    this.status = AppointmentStatus.scheduled,
   });
 }

@@ -17,6 +17,14 @@ class PatientRepository {
       return null;
     }
   }
+
+  Patient? getByPhoneNumber(String contact) {
+    try {
+      return dataSource.patients.firstWhere((p) => p.contact == contact);
+    } catch (e) {
+      return null;
+    }
+  }
   
   List<Patient> getAll() {
     return dataSource.patients;

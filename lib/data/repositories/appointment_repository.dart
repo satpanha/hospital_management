@@ -31,6 +31,13 @@ class AppointmentRepository {
     }).toList();
   }
 
+  List<Appointment> getByDoctor(String doctorId) {
+  return dataSource.appointments
+      .where((a) => a.doctorId == doctorId)
+      .toList();
+}
+
+
   void update(Appointment a) {
     dataSource.updateAppointment(a);
   }

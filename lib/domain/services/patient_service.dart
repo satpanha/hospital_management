@@ -29,6 +29,10 @@ class PatientService {
     return patientRepository.getById(id);
   }
 
+  Patient? getPatientByPhoneNumber(String contact) {
+    return patientRepository.getByPhoneNumber(contact);
+  }
+
   List<Patient> searchPatients(String query) {
     return patientRepository.search(query);
   }

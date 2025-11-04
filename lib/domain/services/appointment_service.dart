@@ -37,17 +37,16 @@ class AppointmentService {
     if (appointment == null) {
       throw Exception('Appointment not found.');
     }
-    appointment.status = AppointmentStatus.Cancelled;
+    appointment.status = AppointmentStatus.cancelled;
     appointmentRepository.update(appointment);
   }
   
   void rescheduleAppointment(String appointmentId, DateTime newDateTime) {
-     final appointment = appointmentRepository.getById(appointmentId);
+    final appointment = appointmentRepository.getById(appointmentId);
     if (appointment == null) {
       throw Exception('Appointment not found.');
     }
     
-    // Check for conflicts at the new time
     final existingAppointments = appointmentRepository.getByDoctorAndDate(appointment.doctorId, newDateTime);
     if (existingAppointments.any((appt) => appt.dateTime == newDateTime && appt.id != appointmentId)) {
       throw Exception('New time slot is already booked.');
@@ -58,13 +57,13 @@ class AppointmentService {
       patientId: appointment.patientId,
       doctorId: appointment.doctorId,
       dateTime: newDateTime,
-      status: AppointmentStatus.Scheduled,
+      status: AppointmentStatus.scheduled,
     );
     
     appointmentRepository.update(updatedAppointment);
   }
   
-  List<Appointment> getDoctorSchedule(String doctorId, DateTime date) {
-    return appointmentRepository.getByDoctorAndDate(doctorId, date);
+  List<Appointment> getDoctorSchedule(String doctorId) {
+    return appointmentRepository.getByDoctor(doctorId);
   }
 }

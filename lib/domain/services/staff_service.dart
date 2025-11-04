@@ -11,8 +11,7 @@ class StaffService {
     final newStaff = Staff(
       id: IdGenerator.generate(),
       name: name,
-      role: role,
-      department: department,
+      role: role
     );
     staffRepository.add(newStaff);
     return newStaff;

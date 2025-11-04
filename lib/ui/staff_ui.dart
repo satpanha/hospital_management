@@ -2,6 +2,7 @@ import 'dart:io';
 
 import '../domain/models/staff.dart';
 import '../domain/services/staff_service.dart';
+import '../utils/io.dart';
 
 class StaffUI {
   final StaffService staffService;
@@ -9,36 +10,47 @@ class StaffUI {
   StaffUI(this.staffService);
 
   void displayStaffMenu() {
-    while (true) {
-      print('\n--- Staff Management ---');
-      print('1. Add New Staff Member');
-      print('2. Search/View Staff');
-      print('3. Update Staff Details');
-      print('4. View All Staff');
-      print('5. Back to Main Menu');
-      stdout.write('Enter your choice: ');
+  while (true) {
+    clearScreen();
+    print('=== Staff Management ===');
+    print('1. Add New Staff Member');
+    print('2. Search/View Staff');
+    print('3. Update Staff Details');
+    print('4. View All Staff');
+    print('5. Back to Main Menu');
+    stdout.write('\nEnter your choice: ');
 
-      final choice = stdin.readLineSync();
-      switch (choice) {
-        case '1':
-          addStaff();
-          break;
-        case '2':
-          searchStaff();
-          break;
-        case '3':
-          updateStaff();
-          break;
-        case '4':
-          listAllStaff();
-          break;
-        case '5':
-          return;
-        default:
-          print('Invalid choice.');
-      }
+    final choice = stdin.readLineSync();
+
+    switch (choice) {
+      case '1':
+        clearScreen();
+        addStaff();
+        pause();
+        break;
+      case '2':
+        clearScreen();
+        searchStaff();
+        pause();
+        break;
+      case '3':
+        clearScreen();
+        updateStaff();
+        pause();
+        break;
+      case '4':
+        clearScreen();
+        listAllStaff();
+        pause();
+        break;
+      case '5':
+        return;
+      default:
+        print('\nInvalid choice. Please try again.');
+        pause();
     }
   }
+}
 
   void addStaff() {
     print('\n--- Add New Staff ---');
@@ -95,8 +107,6 @@ class StaffUI {
     }
 
     print('Enter new details (leave blank to keep current value):');
-    stdout.write('Department (${staff.department}): ');
-    final department = stdin.readLineSync()!;
     stdout.write('Availability (${staff.availability}): ');
     final availability = stdin.readLineSync()!;
 
@@ -104,7 +114,6 @@ class StaffUI {
       id: staff.id,
       name: staff.name,
       role: staff.role,
-      department: department.isNotEmpty ? department : staff.department,
       availability: availability.isNotEmpty ? availability : staff.availability,
     );
     
