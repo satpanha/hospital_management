@@ -1,22 +1,18 @@
 import 'dart:io';
 import 'package:intl/intl.dart';
-
 import '../domain/services/appointment_service.dart';
 import '../domain/services/patient_service.dart';
 import '../domain/services/staff_service.dart';
 import '../utils/date_utils.dart';
 import '../utils/io.dart';
+import '../utils/validation.dart';
 
 class AppointmentUI {
   final AppointmentService appointmentService;
   final PatientService patientService;
   final StaffService staffService;
 
-  AppointmentUI(
-    this.appointmentService,
-    this.patientService,
-    this.staffService,
-  );
+  AppointmentUI(this.appointmentService, this.patientService, this.staffService);
 
   void displayAppointmentMenu() {
     while (true) {
@@ -55,7 +51,7 @@ class AppointmentUI {
         case '5':
           return;
         default:
-          print('\nInvalid choice. Please try again.');
+          print('Invalid choice. Try again.');
           pause();
       }
     }
@@ -63,19 +59,16 @@ class AppointmentUI {
 
   void bookAppointment() {
     print('\n--- Book New Appointment ---');
-    stdout.write('Enter Patient Phone Number: ');
-    final patientContact = stdin.readLineSync()!;
+    final patientContact = readPhone('Enter Patient Phone Number: ');
     final patient = patientService.getPatientByPhoneNumber(patientContact);
     if (patient == null) {
-      print('Error: Patient not found.');
+      print('Patient not found.');
       return;
-    } else {
-      print(patient);
     }
 
     final doctors = staffService
         .getAllStaff()
-        .where((staff) => staff.role.toLowerCase() == 'doctor')
+        .where((s) => s.role.toLowerCase() == 'doctor')
         .toList();
 
     if (doctors.isEmpty) {
@@ -85,72 +78,25 @@ class AppointmentUI {
 
     print('\n--- Available Doctors ---');
     for (var i = 0; i < doctors.length; i++) {
-      print(
-        '${i + 1}. ${doctors[i].name} - (${doctors[i].availability})',
-      );
+      print('${i + 1}. ${doctors[i].name} (${doctors[i].availability})');
     }
 
-    stdout.write('Select a doctor by number: ');
-    final doctorChoice = stdin.readLineSync();
-
-    if (doctorChoice == null || int.tryParse(doctorChoice) == null) {
-      print('Invalid selection.');
-      return;
-    }
-
-    final selectedIndex = int.parse(doctorChoice) - 1;
-
-    if (selectedIndex < 0 || selectedIndex >= doctors.length) {
-      print('Invalid selection.');
-      return;
-    }
-
-    final selectedDoctor = doctors[selectedIndex];
-    final doctorId = selectedDoctor.id;
-
-    print(
-      'You selected Dr. ${selectedDoctor.name}.',
-    );
-
-    stdout.write('Enter Appointment Date (YYYY-MM-DD): ');
-    final dateInput = stdin.readLineSync()?.trim();
-    if (dateInput == null || dateInput.isEmpty) {
-      print('Invalid date input.');
-      return;
-    }
-
-    stdout.write('Enter Appointment Time (HH:MM): ');
-    final timeInput = stdin.readLineSync()?.trim();
-    if (timeInput == null || timeInput.isEmpty) {
-      print('Invalid time input.');
-      return;
-    }
-
-    DateTime? dateTime;
-    try {
-      final combined = '$dateInput $timeInput';
-      dateTime = DateFormat('yyyy-MM-dd HH:mm').parseStrict(combined);
-    } catch (e) {
-      print('Invalid date or time format. Please use YYYY-MM-DD and HH:MM.');
-      return;
-    }
+    final doctorChoice = readInt('Select a doctor by number: ', min: 1, max: doctors.length);
+    final selectedDoctor = doctors[doctorChoice - 1];
+    final date = readDate('Enter Appointment Date (YYYY-MM-DD): ');
+    final time = readTime('Enter Appointment Time (HH:MM): ');
+    final dateTime = DateFormat('yyyy-MM-dd HH:mm').parseStrict('${DateFormat('yyyy-MM-dd').format(date)} $time');
 
     try {
-      final appointment = appointmentService.bookAppointment(
-        patientContact,
-        doctorId,
-        dateTime,
-      );
-      print('Appointment booked successfully with ID: ${appointment.id}');
+      final appointment = appointmentService.bookAppointment(patientContact, selectedDoctor.id, dateTime);
+      print('Appointment booked successfully (ID: ${appointment.id})');
     } catch (e) {
       print('Error: ${e.toString()}');
     }
   }
 
   void viewDoctorSchedule() {
-    stdout.write('Enter Doctor ID to view schedule: ');
-    final doctorId = stdin.readLineSync()!;
-
+    final doctorId = readId('Enter Doctor ID to view schedule: ');
     final doctor = staffService.getStaffById(doctorId);
     if (doctor == null) {
       print('Doctor not found.');
@@ -158,34 +104,22 @@ class AppointmentUI {
     }
 
     final schedule = appointmentService.getDoctorSchedule(doctorId);
-
     if (schedule.isEmpty) {
       print('No appointments found for Dr. ${doctor.name}.');
       return;
     }
 
-    print('\n--- All Appointments for Dr. ${doctor.name} ---');
-    print('Today : ${DateTime.now()}');
+    print('\n--- Schedule for Dr. ${doctor.name} ---');
     for (final appt in schedule) {
       final patient = patientService.getPatientById(appt.patientId);
-      final remaining = calculateRemainingTime(appt.dateTime);
-
-      print(
-        '\n Date: ${formatDateOnly(appt.dateTime)}'
-        '\n Time: ${formatTimeOnly(appt.dateTime)}'
-        '\n Patient: ${patient?.name ?? "Unknown"}'
-        '\n Contact: ${patient?.contact ?? "N/A"}'
-        '\n Remaining: $remaining '
-        '\n ---------------------------------------------------------',
-      );
+      print('${formatDateOnly(appt.dateTime)} ${formatTimeOnly(appt.dateTime)} - ${patient?.name ?? "Unknown"} (${appt.status})');
     }
   }
 
   void cancelAppointment() {
-    stdout.write('Enter Appointment ID to cancel: ');
-    final appointmentId = stdin.readLineSync()!;
+    final id = readId('Enter Appointment ID to cancel: ');
     try {
-      appointmentService.cancelAppointment(appointmentId);
+      appointmentService.cancelAppointment(id);
       print('Appointment cancelled successfully.');
     } catch (e) {
       print('Error: ${e.toString()}');
@@ -193,15 +127,13 @@ class AppointmentUI {
   }
 
   void rescheduleAppointment() {
-    stdout.write('Enter Appointment ID to reschedule: ');
-    final appointmentId = stdin.readLineSync()!;
-
-    stdout.write('Enter new date and time (YYYY-MM-DD HH:MM): ');
-    final newDateTimeStr = stdin.readLineSync()!;
-    final newDateTime = DateTime.parse(newDateTimeStr);
+    final id = readId('Enter Appointment ID to reschedule: ');
+    final date = readDate('Enter New Date (YYYY-MM-DD): ');
+    final time = readTime('Enter New Time (HH:MM): ');
+    final newDateTime = DateFormat('yyyy-MM-dd HH:mm').parseStrict('${DateFormat('yyyy-MM-dd').format(date)} $time');
 
     try {
-      appointmentService.rescheduleAppointment(appointmentId, newDateTime);
+      appointmentService.rescheduleAppointment(id, newDateTime);
       print('Appointment rescheduled successfully.');
     } catch (e) {
       print('Error: ${e.toString()}');

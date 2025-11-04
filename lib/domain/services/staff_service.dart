@@ -7,7 +7,7 @@ class StaffService {
 
   StaffService(this.staffRepository);
 
-  Staff addStaff(String name, String role, String department) {
+  Staff addStaff(String name, String role,) {
     final newStaff = Staff(
       id: IdGenerator.generate(),
       name: name,

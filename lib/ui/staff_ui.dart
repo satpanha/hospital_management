@@ -58,10 +58,8 @@ class StaffUI {
     final name = stdin.readLineSync()!;
     stdout.write('Enter Role (e.g., Doctor, Nurse): ');
     final role = stdin.readLineSync()!;
-    stdout.write('Enter Department: ');
-    final department = stdin.readLineSync()!;
 
-    final staff = staffService.addStaff(name, role, department);
+    final staff = staffService.addStaff(name, role);
     print('Staff member added successfully with ID: ${staff.id}');
     
     if(role.toLowerCase() == 'doctor') {
