@@ -20,6 +20,43 @@ class Staff extends Person {
     required this.password,
   });
 
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'name': name,
+      'dob': dob.toIso8601String(),
+      'contact': contact,
+      'address': address,
+      'role': role.toString().split('.').last,
+      'specialization': specialization,
+      'availability': availability,
+      'password': password,
+    };
+  }
+
+  factory Staff.fromJson(Map<String, dynamic> json) {
+    return Staff(
+      id: json['id'],
+      name: json['name'],
+      dob: DateTime.parse(json['dob']),
+      contact: json['contact'],
+      address: json['address'],
+      role: Role.values.firstWhere(
+          (e) => e.toString().split('.').last == json['role'],
+          orElse: () => Role.receptionist),
+      specialization: json['specialization'] ?? 'None',
+      availability: json['availability'] ?? 'Not set',
+      password: json['password'],
+    );
+  }
+  
+  void validate() {
+    if (id.isEmpty) throw ArgumentError('Staff ID cannot be empty');
+    if (name.isEmpty) throw ArgumentError('Staff name cannot be empty');
+    if (role.isEmpty) throw ArgumentError('Staff role cannot be empty');
+    if (department.isEmpty) throw ArgumentError('Staff department cannot be empty');
+  }
+
   @override
   String toString() {
     return '${super.toString()}, Role: $role, '
