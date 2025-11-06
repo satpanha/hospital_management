@@ -1,45 +1,153 @@
+import 'dart:convert';
+import 'dart:io';
+
 import '../../domain/models/appointment.dart';
 import '../../domain/models/patient.dart';
 import '../../domain/models/staff.dart';
 
 class InMemoryDataSource {
+  // Internal data lists
   final List<Patient> _patients = [];
   final List<Staff> _staff = [];
   final List<Appointment> _appointments = [];
 
+  static const String _dataDir = 'data';
+  static const String _patientsFile = 'data/patients.json';
+  static const String _staffFile = 'data/staff.json';
+  static const String _appointmentsFile = 'data/appointments.json';
+
   InMemoryDataSource() {
-    _initializeSampleData();
+    _ensureDataDirExists();
+    loadAll();
+
+    // If empty → create sample data
+    if (_patients.isEmpty && _staff.isEmpty && _appointments.isEmpty) {
+      _initializeSampleData();
+      saveAll();
+    }
+  }
+
+  void _ensureDataDirExists() {
+    final dir = Directory(_dataDir);
+    if (!dir.existsSync()) {
+      dir.createSync(recursive: true);
+    }
+  }
+
+  List<dynamic> _readJsonFile(String path) {
+    final file = File(path);
+    if (!file.existsSync()) return [];
+
+    try {
+      final raw = file.readAsStringSync();
+      return jsonDecode(raw);
+    } catch (_) {
+      return []; // prevents crash on corrupted JSON
+    }
+  }
+
+  void _writeJsonFile(String path, List<dynamic> jsonList) {
+    File(path).writeAsStringSync(jsonEncode(jsonList), flush: true);
+  }
+
+  void loadAll() {
+    loadPatients();
+    loadStaff();
+    loadAppointments();
+  }
+
+  void saveAll() {
+    savePatients();
+    saveStaff();
+    saveAppointments();
+  }
+
+  void loadPatients() {
+    final jsonList = _readJsonFile(_patientsFile);
+    _patients
+      ..clear()
+      ..addAll(jsonList.map((e) => Patient.fromJson(e)));
+  }
+
+  void savePatients() {
+    _writeJsonFile(_patientsFile, _patients.map((e) => e.toJson()).toList());
   }
 
   List<Patient> get patients => _patients;
-  
-  void addPatient(Patient p) => _patients.add(p);
+
+  void addPatient(Patient p) {
+    _patients.add(p);
+    savePatients();
+  }
 
   void updatePatient(Patient p) {
-    final index = _patients.indexWhere((patient) => patient.id == p.id);
-    if (index != -1) _patients[index] = p;
+    final index = _patients.indexWhere((x) => x.id == p.id);
+    if (index != -1) {
+      _patients[index] = p;
+      savePatients();
+    }
+  }
+
+  void loadStaff() {
+    final jsonList = _readJsonFile(_staffFile);
+    _staff
+      ..clear()
+      ..addAll(jsonList.map((e) => Staff.fromJson(e)));
+  }
+
+  void saveStaff() {
+    _writeJsonFile(_staffFile, _staff.map((e) => e.toJson()).toList());
   }
 
   List<Staff> get staff => _staff;
-  void addStaff(Staff s) => _staff.add(s);
-  
+
+  void addStaff(Staff s) {
+    _staff.add(s);
+    saveStaff();
+  }
+
   void updateStaff(Staff s) {
-    final index = _staff.indexWhere((staff) => staff.id == s.id);
-    if (index != -1) _staff[index] = s;
+    final index = _staff.indexWhere((x) => x.id == s.id);
+    if (index != -1) {
+      _staff[index] = s;
+      saveStaff();
+    }
+  }
+
+  void loadAppointments() {
+    final jsonList = _readJsonFile(_appointmentsFile);
+
+    _appointments
+      ..clear()
+      ..addAll(jsonList.map((e) => Appointment.fromJson(e)));
+  }
+
+  void saveAppointments() {
+    _writeJsonFile(
+      _appointmentsFile,
+      _appointments.map((e) => e.toJson()).toList(),
+    );
   }
 
   List<Appointment> get appointments => _appointments;
-  void addAppointment(Appointment a) => _appointments.add(a);
-  
+
+  void addAppointment(Appointment a) {
+    _appointments.add(a);
+    saveAppointments();
+  }
+
   void updateAppointment(Appointment a) {
-    final index = _appointments.indexWhere((appt) => appt.id == a.id);
-    if (index != -1) _appointments[index] = a;
+    final index = _appointments.indexWhere((x) => x.id == a.id);
+    if (index != -1) {
+      _appointments[index] = a;
+      saveAppointments();
+    }
   }
 
   // Below is AI-Generate Code
   // === Initialization ===
   void _initializeSampleData() {
-    // === Sample Patients ===
+    // Sample Patients
     _patients.addAll([
       Patient(
         id: 'P001',
@@ -71,7 +179,7 @@ class InMemoryDataSource {
       ),
     ]);
 
-    // === Sample Staff ===
+    // Sample Staff
     _staff.addAll([
       Staff(
         id: 'D001',
@@ -130,13 +238,13 @@ class InMemoryDataSource {
       ),
     ]);
 
-    // === Lookup helpers ===
+    // Appointment Sample Data
     Staff getDoctor(String id) =>
         _staff.firstWhere((s) => s.id == id && s.role == Role.doctor);
+
     Patient getPatient(String id) =>
         _patients.firstWhere((p) => p.id == id);
 
-    // === Sample Appointments (with references) ===
     _appointments.addAll([
       Appointment(
         id: 'AP001',
