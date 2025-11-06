@@ -48,13 +48,6 @@ class Appointment {
     );
   }
 
-  void validate() {
-    if (id.isEmpty) throw ArgumentError('Appointment ID cannot be empty');
-    if (patientId.isEmpty) throw ArgumentError('Patient ID cannot be empty');
-    if (doctorId.isEmpty) throw ArgumentError('Doctor ID cannot be empty');
-    if (dateTime.isBefore(DateTime.now())) throw ArgumentError('Appointment date cannot be in the past');
-  }  
-
   @override
   String toString() {
     return 'Appointment(id: $id, patient: ${patient.name}, doctor: ${doctor.name}, '

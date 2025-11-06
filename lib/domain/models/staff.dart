@@ -50,13 +50,6 @@ class Staff extends Person {
     );
   }
   
-  void validate() {
-    if (id.isEmpty) throw ArgumentError('Staff ID cannot be empty');
-    if (name.isEmpty) throw ArgumentError('Staff name cannot be empty');
-    if (role.isEmpty) throw ArgumentError('Staff role cannot be empty');
-    if (department.isEmpty) throw ArgumentError('Staff department cannot be empty');
-  }
-
   @override
   String toString() {
     return '${super.toString()}, Role: $role, '
