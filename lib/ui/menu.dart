@@ -1,84 +1,60 @@
 import 'dart:io';
-
-import '../domain/services/appointment_service.dart';
-import '../domain/services/patient_service.dart';
-import '../domain/services/staff_service.dart';
+import '../../domain/models/staff.dart';
+import '../../domain/services/patient_service.dart';
+import '../../domain/services/staff_service.dart';
+import '../../domain/services/appointment_service.dart';
 import 'appointment_ui.dart';
 import 'patient_ui.dart';
 import 'staff_ui.dart';
+import 'doctor_menu.dart';
+import 'receptionist_menu.dart';
+import 'admin_menu.dart';
 
-class Menu {
+class MainMenu {
   final PatientService patientService;
   final StaffService staffService;
   final AppointmentService appointmentService;
-  
+
   late final PatientUI patientUI;
   late final StaffUI staffUI;
   late final AppointmentUI appointmentUI;
 
-  Menu({
+  MainMenu({
     required this.patientService,
     required this.staffService,
     required this.appointmentService,
   }) {
-    patientUI = PatientUI(patientService);
+    patientUI = PatientUI(patientService,staffService);
     staffUI = StaffUI(staffService);
     appointmentUI = AppointmentUI(appointmentService, patientService, staffService);
   }
 
-  void displayMainMenu() {
+  void start() {
+    print('\n===== Welcome to Hospital Management System =====');
     while (true) {
-      print('\n===== Hospital Management System =====');
-      print('1. Manage Patients');
-      print('2. Manage Appointments');
-      print('3. Manage Staff');
-      print('4. Exit');
-      stdout.write('Enter your choice: ');
+      stdout.write('Enter Staff ID: ');
+      final id = stdin.readLineSync();
+      stdout.write('Enter Password: ');
+      final password = stdin.readLineSync();
 
-      final choice = stdin.readLineSync();
-      switch (choice) {
-        case '1':
-          patientUI.displayPatientMenu();
-          break;
-        case '2':
-          appointmentUI.displayAppointmentMenu();
-          break;
-        case '3':
-          staffUI.displayStaffMenu();
-          break;
-        case '4':
-          return;
-        default:
-          print('Invalid choice. Please try again.');
+      final staff = staffService.getStaffById(id!);
+      if (staff != null && staff.password == password) {
+        print('\nLogin successful! Welcome, ${staff.name} (${staff.role.name.toUpperCase()})');
+
+        switch (staff.role) {
+          case Role.doctor:
+            DoctorMenu(appointmentService, patientService,appointmentUI,patientUI).show(doctor: staff);
+            break;
+          case Role.receptionist:
+            ReceptionistMenu(patientUI, appointmentUI).show();
+            break;
+          case Role.admin:
+            AdminMenu(staffUI).show();
+            break;
+        }
+      } else {
+        print('\nInvalid ID or password. Please try again.\n');
       }
     }
   }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

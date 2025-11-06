@@ -4,7 +4,7 @@ class Patient {
   final DateTime dob;
   final String contact;
   final String address;
-  final String medicalSummary;
+  List<String> medicalList = [];
 
   Patient({
     required this.id,
@@ -12,11 +12,14 @@ class Patient {
     required this.dob,
     required this.contact,
     required this.address,
-    required this.medicalSummary,
   });
-  
+
   @override
   String toString() {
     return 'ID: $id, Name: $name, Contact: $contact, Address: $address';
+  }
+
+  String get medicalSummary {
+    return medicalList.isEmpty ? 'No Medical History' : medicalList.join('\n');
   }
 }

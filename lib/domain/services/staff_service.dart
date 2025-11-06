@@ -7,11 +7,12 @@ class StaffService {
 
   StaffService(this.staffRepository);
 
-  Staff addStaff(String name, String role,) {
+  Staff addStaff(String name, Role role,String password) {
     final newStaff = Staff(
       id: IdGenerator.generate(),
       name: name,
-      role: role
+      role: role,
+      password: password,
     );
     staffRepository.add(newStaff);
     return newStaff;

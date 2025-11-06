@@ -11,15 +11,14 @@ class PatientService {
 
   PatientService(this.patientRepository, this.appointmentRepository);
 
-  Patient registerPatient(String name, DateTime dob, String contact, String address, String summary) {
+  Patient registerPatient(String name, DateTime dob, String contact, String address) {
     final id = IdGenerator.generate();
     final newPatient = Patient(
       id: id,
       name: name,
       dob: dob,
       contact: contact,
-      address: address,
-      medicalSummary: summary,
+      address: address
     );
     patientRepository.addPatient(newPatient);
     return newPatient;

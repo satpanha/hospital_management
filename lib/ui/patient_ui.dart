@@ -1,5 +1,8 @@
 import 'dart:io';
+import 'package:hostpital_management/domain/services/staff_service.dart';
+
 import '../domain/models/patient.dart';
+import '../domain/models/appointment.dart';
 import '../domain/services/patient_service.dart';
 import '../utils/date_utils.dart';
 import '../utils/io.dart';
@@ -7,15 +10,16 @@ import '../utils/validation.dart';
 
 class PatientUI {
   final PatientService patientService;
-  PatientUI(this.patientService);
+  final StaffService staffService;
+  PatientUI(this.patientService,this.staffService);
 
   void displayPatientMenu() {
     while (true) {
       clearScreen();
       print('=== Patient Management ===');
       print('1. Register New Patient');
-      print('2. Search/View Patient');
-      print('3. Update Patient Details');
+      print('2. Search/View Patient Details');
+      print('3. Update Patient Information');
       print('4. View All Patients');
       print('5. View Patient Appointment History');
       print('6. Back to Main Menu');
@@ -30,7 +34,7 @@ class PatientUI {
           break;
         case '2':
           clearScreen();
-          searchPatient();
+          searchAndDisplayPatient();
           pause();
           break;
         case '3':
@@ -63,21 +67,29 @@ class PatientUI {
     final dob = readDate('Enter Date of Birth (YYYY-MM-DD): ');
     final contact = readPhone('Enter Contact Number: ');
     final address = readNonEmpty('Enter Address: ');
-    final summary = readNonEmpty('Enter Medical Summary: ');
 
-    final patient = patientService.registerPatient(name, dob, contact, address, summary);
-    print('Patient registered successfully with ID: ${patient.id}');
+    final patient = patientService.registerPatient(
+      name,
+      dob,
+      contact,
+      address,
+    );
+    print('\nPatient registered successfully with ID: ${patient.id}');
   }
 
-  void searchPatient() {
-    final query = readNonEmpty('Enter Patient ID, Name, or Phone to search: ');
+  void searchAndDisplayPatient() {
+    final query = readNonEmpty('Enter Patient ID, Name, or Phone: ');
     final patients = patientService.searchPatients(query);
+
     if (patients.isEmpty) {
       print('No patients found.');
       return;
     }
+
     print('\n--- Search Results ---');
-    patients.forEach((p) => print(p));
+    for (var p in patients) {
+      _displayPatientDetails(p);
+    }
   }
 
   void listAllPatients() {
@@ -86,8 +98,11 @@ class PatientUI {
       print("No patients registered yet.");
       return;
     }
-    print('\n--- All Patients ---');
-    patients.forEach((p) => print(p));
+
+    print('\n--- All Registered Patients ---');
+    for (var p in patients) {
+      _displayPatientDetails(p);
+    }
   }
 
   void updatePatient() {
@@ -98,7 +113,7 @@ class PatientUI {
       return;
     }
 
-    print('Enter new details (leave blank to keep current value):');
+    print('\nEnter new details (leave blank to keep current):');
     stdout.write('Name (${patient.name}): ');
     final name = stdin.readLineSync()!;
     stdout.write('Contact (${patient.contact}): ');
@@ -111,24 +126,53 @@ class PatientUI {
       name: name.isNotEmpty ? name : patient.name,
       dob: patient.dob,
       contact: contact.isNotEmpty ? contact : patient.contact,
-      address: address.isNotEmpty ? address : patient.address,
-      medicalSummary: patient.medicalSummary,
+      address: address.isNotEmpty ? address : patient.address
     );
 
     patientService.updatePatient(updatedPatient);
-    print('Patient updated successfully.');
+    print('\nPatient information updated successfully.');
   }
 
   void viewAppointmentHistory() {
-    final patientId = readId('Enter Patient ID to view history: ');
-    final history = patientService.getPatientAppointmentHistory(patientId);
-    if (history.isEmpty) {
-      print('No appointment history found.');
+    final patientPhone = readPhone('Enter Patient Phone Number: ');
+    final patient = patientService.getPatientByPhoneNumber(patientPhone);
+
+    if (patient == null) {
+      print('Patient not found.');
       return;
     }
-    print('\n--- Appointment History for $patientId ---');
-    history.forEach((appt) {
-      print('ID: ${appt.id}, Doctor: ${appt.doctorId}, Date: ${formatDate(appt.dateTime)}, Status: ${appt.status}');
-    });
+
+    final history = patientService.getPatientAppointmentHistory(patient.id)
+        .where((appt) => appt.status == AppointmentStatus.completed)
+        .toList();
+
+    if (history.isEmpty) {
+      print('No completed appointments found for ${patient.name}.');
+      return;
+    }
+
+    print('\n--- Appointment History for ${patient.name} ---');
+    for (var appt in history) {
+      final doctor = staffService.getStaffById(appt.doctorId);
+      print('''
+        Appointment ID : ${appt.id}
+        Doctor         : ${doctor?.name ?? appt.doctorId}
+        Date & Time    : ${formatDate(appt.dateTime)}
+        Status         : ${appt.status.name.toUpperCase()}
+        Note           : ${appt.notes ?? 'No note recorded'}
+        Medical        : ${appt.medical ?? 'None '}
+        ''');
+    }
+  }
+
+  void _displayPatientDetails(Patient p) {
+    print('''
+      Patient ID     : ${p.id}
+      Name           : ${p.name}
+      Date of Birth  : ${formatDate(p.dob)}
+      Contact        : ${p.contact}
+      Address        : ${p.address}
+      Medical Summary: ${p.medicalSummary}
+    ''');
   }
 }
