@@ -11,7 +11,7 @@ class PatientService {
 
   PatientService(this.patientRepository, this.appointmentRepository);
 
-  Patient registerPatient(String name, DateTime dob, String contact, String address, String summary) {
+  Patient registerPatient(String name, DateTime dob, String contact, String address) {
     final id = IdGenerator.generate();
     final newPatient = Patient(
       id: id,
@@ -19,7 +19,6 @@ class PatientService {
       dob: dob,
       contact: contact,
       address: address,
-      medicalSummary: summary,
     );
     patientRepository.addPatient(newPatient);
     return newPatient;
@@ -27,6 +26,10 @@ class PatientService {
 
   Patient? getPatientById(String id) {
     return patientRepository.getById(id);
+  }
+
+  Patient? getPatientByPhoneNumber(String contact) {
+    return patientRepository.getByPhoneNumber(contact);
   }
 
   List<Patient> searchPatients(String query) {

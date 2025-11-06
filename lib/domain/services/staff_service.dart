@@ -7,13 +7,26 @@ class StaffService {
 
   StaffService(this.staffRepository);
 
-  Staff addStaff(String name, String role, String department) {
+  Staff addStaff(
+    String name,
+    DateTime dob,
+    String contact,
+    String address,
+    Role role,
+    String specialization,
+    String password,
+  ) {
     final newStaff = Staff(
       id: IdGenerator.generate(),
       name: name,
+      dob: dob,
+      contact: contact,
+      address: address,
       role: role,
-      department: department,
+      specialization: specialization,
+      password: password,
     );
+
     staffRepository.add(newStaff);
     return newStaff;
   }
@@ -21,7 +34,7 @@ class StaffService {
   Staff? getStaffById(String id) {
     return staffRepository.getById(id);
   }
-  
+
   List<Staff> getAllStaff() {
     return staffRepository.getAll();
   }
@@ -33,10 +46,10 @@ class StaffService {
   void updateStaff(Staff staff) {
     staffRepository.update(staff);
   }
-  
+
   void updateStaffAvailability(String staffId, String availability) {
     final staff = getStaffById(staffId);
-    if(staff != null) {
+    if (staff != null) {
       staff.availability = availability;
       updateStaff(staff);
     }

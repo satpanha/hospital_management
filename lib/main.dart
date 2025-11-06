@@ -19,17 +19,16 @@ void main() {
   // 2. Domain Layer
   final patientService = PatientService(patientRepository, appointmentRepository);
   final staffService = StaffService(staffRepository);
-  final appointmentService = AppointmentService(appointmentRepository, staffRepository);
+  final appointmentService = AppointmentService(appointmentRepository, staffRepository,patientRepository);
 
-  // 3. UI Layer
-  final menu = Menu(
+  // --- UI Layer ---
+  final mainMenu = MainMenu(
     patientService: patientService,
     staffService: staffService,
     appointmentService: appointmentService,
   );
 
-  // --- Start Application ---
-  print('Initializing Hospital Management System...');
-  menu.displayMainMenu();
+  mainMenu.start();
+
   print('Exiting System. Goodbye!');
 }
