@@ -55,8 +55,11 @@ class StaffUI {
     print('\n--- Add New Staff ---');
 
     final name = readNonEmpty('Enter Name: ');
+    final dob = readDate('Enter Date of Birth (yyyy-MM-dd): ');
+    final contact = readNonEmpty('Enter Contact Number: ');
+    final address = readNonEmpty('Enter Address: ');
 
-    print('Select Role:');
+    print('\nSelect Role:');
     for (var i = 0; i < Role.values.length; i++) {
       print('${i + 1}. ${Role.values[i].name}');
     }
@@ -68,12 +71,21 @@ class StaffUI {
       selectedRole = Role.values[choice - 1];
     }
 
+    final specialization = readNonEmpty('Enter Specialization: ');
     final password = readNonEmpty('Enter Password: ');
 
-    final staff = staffService.addStaff(name, selectedRole, password);
+    final staff = staffService.addStaff(
+      name,
+      dob,
+      contact,
+      address,
+      selectedRole,
+      specialization,
+      password,
+    );
 
     print(
-        'Staff member added successfully with ID: ${staff.id} and Role: ${selectedRole.name}');
+        '\nStaff member added successfully with ID: ${staff.id} and Role: ${selectedRole.name}');
 
     if (selectedRole == Role.doctor) {
       final availability =
@@ -125,12 +137,16 @@ class StaffUI {
     final updatedStaff = Staff(
       id: staff.id,
       name: staff.name,
+      dob: staff.dob,
+      contact: staff.contact,
+      address: staff.address,
       role: staff.role,
       password: staff.password,
-      availability: availability.isNotEmpty
-          ? availability
-          : staff.availability,
+      specialization: staff.specialization,
+      availability:
+          availability.isNotEmpty ? availability : staff.availability,
     );
+
     staffService.updateStaff(updatedStaff);
     print('Staff details updated successfully.');
   }

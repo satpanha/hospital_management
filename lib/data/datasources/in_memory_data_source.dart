@@ -36,72 +36,93 @@ class InMemoryDataSource {
   }
 
   void _initializeSampleData() {
-    // AI Generate 
+    // AI Generate
     _patients.addAll([
       Patient(
         id: 'P001',
         name: 'John Doe',
         dob: DateTime(1985, 6, 15),
         contact: '0123456789',
-        address: '123 Main Street, Phnom Penh'
+        address: '123 Main Street, Phnom Penh',
       ),
       Patient(
         id: 'P002',
         name: 'Sokha Chan',
         dob: DateTime(1990, 2, 10),
         contact: '0987654321',
-        address: '45 Norodom Blvd, Phnom Penh'
+        address: '45 Norodom Blvd, Phnom Penh',
       ),
       Patient(
         id: 'P003',
         name: 'Lisa Kim',
         dob: DateTime(2000, 11, 25),
         contact: '0971122334',
-        address: 'Siem Reap City'
+        address: 'Siem Reap City',
       ),
       Patient(
         id: 'P004',
         name: 'Rith Dara',
         dob: DateTime(1975, 3, 5),
         contact: '0967788990',
-        address: 'Battambang Province'
+        address: 'Battambang Province',
       ),
     ]);
 
+    // === Sample Staff ===
     // === Sample Staff ===
     _staff.addAll([
       Staff(
         id: 'D001',
         name: 'Dr. Dara Vann',
+        dob: DateTime(1980, 5, 12),
+        contact: '012345678',
+        address: 'Phnom Penh, Cambodia',
         role: Role.doctor,
+        specialization: 'Cardiology',
         availability: 'Mon-Fri 9am-4pm',
         password: '1234',
       ),
       Staff(
         id: 'D002',
         name: 'Dr. Kim Leng',
+        dob: DateTime(1985, 3, 20),
+        contact: '098765432',
+        address: 'Siem Reap, Cambodia',
         role: Role.doctor,
+        specialization: 'Pediatrics',
         availability: 'Mon-Sat 8am-5pm',
         password: '1234',
       ),
       Staff(
         id: 'N001',
         name: 'Nurse Srey Neang',
+        dob: DateTime(1990, 10, 5),
+        contact: '011223344',
+        address: 'Battambang, Cambodia',
         role: Role.receptionist,
+        specialization: 'Nursing',
         availability: 'Mon-Fri 7am-3pm',
         password: '1234',
       ),
       Staff(
         id: 'A001',
         name: 'Sok Phirun',
+        dob: DateTime(1992, 7, 8),
+        contact: '015667788',
+        address: 'Kampot, Cambodia',
         role: Role.receptionist,
+        specialization: 'Front Desk',
         availability: 'Mon-Fri 8am-5pm',
         password: '1234',
       ),
       Staff(
         id: '0000',
         name: 'Admin',
+        dob: DateTime(1988, 1, 1),
+        contact: '010000000',
+        address: 'Phnom Penh, Cambodia',
         role: Role.admin,
+        specialization: 'System Administration',
         availability: 'Mon-Fri 8am-5pm',
         password: '1234',
       ),

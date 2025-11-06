@@ -1,21 +1,29 @@
+import 'package:hostpital_management/domain/models/person.dart';
+
 enum Role { receptionist, doctor, admin }
 
-class Staff {
-  String id;
-  String name;
+class Staff extends Person {
   Role role;
-  String availability; // Mon-Fri 9am-5pm
+  String specialization;
+  String availability;
   String password;
 
   Staff({
-    required this.id,
-    required this.name,
+    required super.id,
+    required super.name,
+    required super.dob,
+    required super.contact,
+    required super.address,
     required this.role,
+    this.specialization = 'None',
     this.availability = 'Not set',
-    required this.password
+    required this.password,
   });
+
   @override
   String toString() {
-    return 'ID: $id, Name: $name, Role: $role, Availability: $availability';
+    return '${super.toString()}, Role: $role, '
+        'Specialization: $specialization, Availability: $availability, '
+        'Contact: $contact, Address: $address';
   }
 }
