@@ -11,7 +11,7 @@ import '../utils/validation.dart';
 class PatientUI {
   final PatientService patientService;
   final StaffService staffService;
-  PatientUI(this.patientService,this.staffService);
+  PatientUI(this.patientService, this.staffService);
 
   void displayPatientMenu() {
     while (true) {
@@ -68,12 +68,7 @@ class PatientUI {
     final contact = readPhone('Enter Contact Number: ');
     final address = readNonEmpty('Enter Address: ');
 
-    final patient = patientService.registerPatient(
-      name,
-      dob,
-      contact,
-      address,
-    );
+    final patient = patientService.registerPatient(name, dob, contact, address);
     print('\nPatient registered successfully with ID: ${patient.id}');
   }
 
@@ -126,7 +121,7 @@ class PatientUI {
       name: name.isNotEmpty ? name : patient.name,
       dob: patient.dob,
       contact: contact.isNotEmpty ? contact : patient.contact,
-      address: address.isNotEmpty ? address : patient.address
+      address: address.isNotEmpty ? address : patient.address,
     );
 
     patientService.updatePatient(updatedPatient);
@@ -142,7 +137,8 @@ class PatientUI {
       return;
     }
 
-    final history = patientService.getPatientAppointmentHistory(patient.id)
+    final history = patientService
+        .getPatientAppointmentHistory(patient.id)
         .where((appt) => appt.status == AppointmentStatus.completed)
         .toList();
 
@@ -153,10 +149,9 @@ class PatientUI {
 
     print('\n--- Appointment History for ${patient.name} ---');
     for (var appt in history) {
-      final doctor = staffService.getStaffById(appt.doctorId);
       print('''
         Appointment ID : ${appt.id}
-        Doctor         : ${doctor?.name ?? appt.doctorId}
+        Doctor         : ${appt.doctor.name}
         Date & Time    : ${formatDate(appt.dateTime)}
         Status         : ${appt.status.name.toUpperCase()}
         Note           : ${appt.notes ?? 'No note recorded'}

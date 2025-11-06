@@ -18,7 +18,7 @@ class PatientService {
       name: name,
       dob: dob,
       contact: contact,
-      address: address
+      address: address,
     );
     patientRepository.addPatient(newPatient);
     return newPatient;

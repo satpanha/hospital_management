@@ -12,6 +12,7 @@ class InMemoryDataSource {
   }
 
   List<Patient> get patients => _patients;
+  
   void addPatient(Patient p) => _patients.add(p);
 
   void updatePatient(Patient p) {
@@ -21,7 +22,7 @@ class InMemoryDataSource {
 
   List<Staff> get staff => _staff;
   void addStaff(Staff s) => _staff.add(s);
-
+  
   void updateStaff(Staff s) {
     final index = _staff.indexWhere((staff) => staff.id == s.id);
     if (index != -1) _staff[index] = s;
@@ -29,14 +30,16 @@ class InMemoryDataSource {
 
   List<Appointment> get appointments => _appointments;
   void addAppointment(Appointment a) => _appointments.add(a);
-
+  
   void updateAppointment(Appointment a) {
     final index = _appointments.indexWhere((appt) => appt.id == a.id);
     if (index != -1) _appointments[index] = a;
   }
 
+  // Below is AI-Generate Code
+  // === Initialization ===
   void _initializeSampleData() {
-    // AI Generate
+    // === Sample Patients ===
     _patients.addAll([
       Patient(
         id: 'P001',
@@ -68,7 +71,6 @@ class InMemoryDataSource {
       ),
     ]);
 
-    // === Sample Staff ===
     // === Sample Staff ===
     _staff.addAll([
       Staff(
@@ -128,54 +130,55 @@ class InMemoryDataSource {
       ),
     ]);
 
-    // === Sample Appointments ===
+    // === Lookup helpers ===
+    Staff getDoctor(String id) =>
+        _staff.firstWhere((s) => s.id == id && s.role == Role.doctor);
+    Patient getPatient(String id) =>
+        _patients.firstWhere((p) => p.id == id);
+
+    // === Sample Appointments (with references) ===
     _appointments.addAll([
       Appointment(
         id: 'AP001',
-        patientId: 'P001',
-        doctorId: 'D001',
+        patient: getPatient('P001'),
+        doctor: getDoctor('D001'),
         dateTime: DateTime.now().add(const Duration(hours: 1)),
         status: AppointmentStatus.scheduled,
       ),
       Appointment(
         id: 'AP002',
-        patientId: 'P002',
-        doctorId: 'D002',
+        patient: getPatient('P002'),
+        doctor: getDoctor('D002'),
         dateTime: DateTime.now().subtract(const Duration(days: 1, hours: 2)),
         status: AppointmentStatus.completed,
-        // Note: Completed - Follow-up in 2 weeks
       ),
       Appointment(
         id: 'AP003',
-        patientId: 'P003',
-        doctorId: 'D001',
+        patient: getPatient('P003'),
+        doctor: getDoctor('D001'),
         dateTime: DateTime.now().add(const Duration(days: 1, hours: 3)),
         status: AppointmentStatus.scheduled,
-        // Note: New consultation for headache
       ),
       Appointment(
         id: 'AP004',
-        patientId: 'P004',
-        doctorId: 'D002',
+        patient: getPatient('P004'),
+        doctor: getDoctor('D002'),
         dateTime: DateTime.now().subtract(const Duration(days: 3)),
         status: AppointmentStatus.completed,
-        // Note: Post-surgery checkup
       ),
       Appointment(
         id: 'AP005',
-        patientId: 'P002',
-        doctorId: 'D001',
+        patient: getPatient('P002'),
+        doctor: getDoctor('D001'),
         dateTime: DateTime.now().add(const Duration(days: 2)),
         status: AppointmentStatus.cancelled,
-        // Note: Cancelled by patient
       ),
       Appointment(
         id: 'AP006',
-        patientId: 'P001',
-        doctorId: 'D002',
+        patient: getPatient('P001'),
+        doctor: getDoctor('D002'),
         dateTime: DateTime.now().subtract(const Duration(days: 5)),
         status: AppointmentStatus.noShow,
-        // Note: Patient did not attend appointment
       ),
     ]);
   }

@@ -89,50 +89,53 @@ class AppointmentUI {
   }
 
   void viewDoctorSchedule(String doctorId) {
-  final doctor = staffService.getStaffById(doctorId);
-  if (doctor == null) {
-    print('Doctor not found.');
-    return;
-  }
-
-  final schedule = appointmentService.getDoctorSchedule(doctorId);
-  if (schedule.isEmpty) {
-    print('No appointments found for Dr. ${doctor.name}.');
-    return;
-  }
-
-  print('\n--- Schedule for Dr. ${doctor.name} - (${formatDateOnly(DateTime.now())}) ---');
-
-  final now = DateTime.now();
-  var shown = false;
-
-  for (final appt in schedule) {
-    if (appt.status == AppointmentStatus.completed || appt.status == AppointmentStatus.cancelled) continue;
-
-    if (appt.dateTime.isBefore(now) &&
-        appt.status == AppointmentStatus.scheduled) {
-      appt.status = AppointmentStatus.noShow;
-      appointmentService.markAppointmentNoShow(appt.id);
+    final doctor = staffService.getStaffById(doctorId);
+    if (doctor == null) {
+      print('Doctor not found.');
+      return;
     }
 
-    final patient = patientService.getPatientById(appt.patientId);
+    final schedule = appointmentService.getDoctorSchedule(doctorId);
+    if (schedule.isEmpty) {
+      print('No appointments found for Dr. ${doctor.name}.');
+      return;
+    }
 
-    
-    print('\nDate: ${formatDateOnly(appt.dateTime)} '
-        '(${appt.dateTime.hour.toString().padLeft(2, '0')}:${appt.dateTime.minute.toString().padLeft(2, '0')})');
-    print(' Patient: ${patient?.name ?? "Unknown"}');
-    print(' Contact: ${patient?.contact ?? "N/A"}');
-    print(' Address: ${patient?.address ?? "N/A"}');
-    print(' Status: ${appt.status.name}');
-    print(' Remaining: ${calculateRemainingTime(appt.dateTime)}');
-    print('-----------------------------------------------------');
-    shown = true;
-  }
-  if (!shown) {
-    print('\nNo upcoming appointments to display.');
-  }
-}
+    print(
+      '\n--- Schedule for Dr. ${doctor.name} - (${formatDateOnly(DateTime.now())}) ---',
+    );
 
+    final now = DateTime.now();
+    var shown = false;
+
+    for (final appt in schedule) {
+      if (appt.status == AppointmentStatus.completed ||
+          appt.status == AppointmentStatus.cancelled) {
+        continue;
+      }
+
+      if (appt.dateTime.isBefore(now) &&
+          appt.status == AppointmentStatus.scheduled) {
+        appt.status = AppointmentStatus.noShow;
+        appointmentService.markAppointmentNoShow(appt.id);
+      }
+
+      print(
+        '\nDate: ${formatDateOnly(appt.dateTime)} '
+        '(${appt.dateTime.hour.toString().padLeft(2, '0')}:${appt.dateTime.minute.toString().padLeft(2, '0')})',
+      );
+      print(' Patient: ${appt.patient.name}');
+      print(' Contact: ${appt.patient.contact}');
+      print(' Address: ${appt.patient.address}');
+      print(' Status: ${appt.status.name}');
+      print(' Remaining: ${calculateRemainingTime(appt.dateTime)}');
+      print('-----------------------------------------------------');
+      shown = true;
+    }
+    if (!shown) {
+      print('\nNo upcoming appointments to display.');
+    }
+  }
 
   void _bookAppointmentInteractive() {
     print('\n--- Book New Appointment ---');

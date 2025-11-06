@@ -1,3 +1,4 @@
+import 'package:hostpital_management/data/repositories/patient_repository.dart';
 import 'package:hostpital_management/domain/models/staff.dart';
 import '../../data/repositories/appointment_repository.dart';
 import '../../data/repositories/staff_repository.dart';
@@ -7,24 +8,40 @@ import '../models/appointment.dart';
 class AppointmentService {
   final AppointmentRepository appointmentRepository;
   final StaffRepository staffRepository;
+  final PatientRepository patientRepository;
 
-  AppointmentService(this.appointmentRepository, this.staffRepository);
 
-  Appointment bookAppointment(String patientId, String doctorId, DateTime dateTime) {
-    final existingAppointments = appointmentRepository.getByDoctorAndDate(doctorId, dateTime);
+  AppointmentService(this.appointmentRepository, this.staffRepository,this.patientRepository);
+
+  Appointment bookAppointment(
+    String patientId,
+    String doctorId,
+    DateTime dateTime,
+  ) {
+    final existingAppointments = appointmentRepository.getByDoctorAndDate(
+      doctorId,
+      dateTime,
+    );
     if (existingAppointments.any((appt) => appt.dateTime == dateTime)) {
       throw Exception('Time slot is already booked.');
     }
 
     final doctor = staffRepository.getById(doctorId);
+    final patient = patientRepository.getById(doctorId);
+
     if (doctor == null || doctor.role != Role.doctor) {
       throw Exception('Invalid Doctor ID.');
     }
 
+    if (patient == null) {
+      throw Exception('Patient not found.');
+    }
+    
+
     final newAppointment = Appointment(
       id: IdGenerator.generate(),
-      patientId: patientId,
-      doctorId: doctorId,
+      patient: patient,
+      doctor: doctor,
       dateTime: dateTime,
     );
 
@@ -44,19 +61,25 @@ class AppointmentService {
     final appointment = appointmentRepository.getById(appointmentId);
     if (appointment == null) throw Exception('Appointment not found.');
 
-    final existingAppointments =
-        appointmentRepository.getByDoctorAndDate(appointment.doctorId, newDateTime);
-    if (existingAppointments.any((appt) => appt.dateTime == newDateTime && appt.id != appointmentId)) {
+    final existingAppointments = appointmentRepository.getByDoctorAndDate(
+      appointment.doctor.id,
+      newDateTime,
+    );
+    if (existingAppointments.any(
+      (appt) => appt.dateTime == newDateTime && appt.id != appointmentId,
+    )) {
       throw Exception('New time slot is already booked.');
     }
 
-    appointmentRepository.update(Appointment(
-      id: appointment.id,
-      patientId: appointment.patientId,
-      doctorId: appointment.doctorId,
-      dateTime: newDateTime,
-      status: AppointmentStatus.scheduled,
-    ));
+    appointmentRepository.update(
+      Appointment(
+        id: appointment.id,
+        patient: appointment.patient,
+        doctor: appointment.doctor,
+        dateTime: newDateTime,
+        status: AppointmentStatus.scheduled,
+      ),
+    );
   }
 
   List<Appointment> getDoctorSchedule(String doctorId) {

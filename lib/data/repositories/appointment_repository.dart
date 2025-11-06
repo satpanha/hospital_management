@@ -17,14 +17,16 @@ class AppointmentRepository {
       return null;
     }
   }
-  
+
   List<Appointment> getByPatientId(String patientId) {
-    return dataSource.appointments.where((a) => a.patientId == patientId).toList();
+    return dataSource.appointments
+        .where((a) => a.patient.id == patientId)
+        .toList();
   }
 
   List<Appointment> getByDoctorAndDate(String doctorId, DateTime date) {
     return dataSource.appointments.where((a) {
-      return a.doctorId == doctorId &&
+      return a.doctor.id == doctorId &&
           a.dateTime.year == date.year &&
           a.dateTime.month == date.month &&
           a.dateTime.day == date.day;
@@ -32,11 +34,8 @@ class AppointmentRepository {
   }
 
   List<Appointment> getByDoctor(String doctorId) {
-  return dataSource.appointments
-      .where((a) => a.doctorId == doctorId)
-      .toList();
-}
-
+    return dataSource.appointments.where((a) => a.doctor == doctorId).toList();
+  }
 
   void update(Appointment a) {
     dataSource.updateAppointment(a);

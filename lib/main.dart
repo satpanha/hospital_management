@@ -19,7 +19,7 @@ void main() {
   // 2. Domain Layer
   final patientService = PatientService(patientRepository, appointmentRepository);
   final staffService = StaffService(staffRepository);
-  final appointmentService = AppointmentService(appointmentRepository, staffRepository);
+  final appointmentService = AppointmentService(appointmentRepository, staffRepository,patientRepository);
 
   // --- UI Layer ---
   final mainMenu = MainMenu(

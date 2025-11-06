@@ -67,11 +67,8 @@ class DoctorMenu {
     print('\n--- Scheduled Appointments ---');
     for (var i = 0; i < appointments.length; i++) {
       final appt = appointments[i];
-      final patient = appointmentUI.patientService.getPatientById(
-        appt.patientId,
-      );
       print(
-        '${i + 1}. Appointment ID: ${appt.id} | Patient: ${patient?.name ?? appt.patientId} | Date: ${formatDate(appt.dateTime)}',
+        '${i + 1}. Appointment ID: ${appt.id} | Patient: ${appt.patient} | Date: ${formatDate(appt.dateTime)}',
       );
     }
 
@@ -92,10 +89,7 @@ class DoctorMenu {
     String medical = readNonEmpty('Enter a medical for patient : ');
     medical += ' at ${selectedAppointment.id} By ${doctor.name}';
 
-    patientService
-        .getPatientById(selectedAppointment.patientId)!
-        .medicalList
-        .add(medical);
+    selectedAppointment.patient.medicalList.add(medical);
 
     appointmentUI.markAppointmentAsCompleted(selectedAppointment.id, desc);
 
@@ -108,9 +102,8 @@ class DoctorMenu {
     for (final appt in appointments.where(
       (a) => a.status == AppointmentStatus.completed,
     )) {
-      final patient = patientService.getPatientById(appt.patientId);
       print(
-        '${patient?.name ?? "Unknown"} on ${appt.dateTime} | Note: ${appt.notes ?? "No notes"}',
+        '${appt.patient.name} on ${appt.dateTime} | Note: ${appt.notes ?? "No notes"}',
       );
     }
   }
