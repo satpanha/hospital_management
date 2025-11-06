@@ -25,18 +25,20 @@ class PatientRepository {
       return null;
     }
   }
-  
+
   List<Patient> getAll() {
     return dataSource.patients;
   }
 
   List<Patient> search(String query) {
-    final lowerCaseQuery = query.toLowerCase();
+    final lower = query.toLowerCase();
     return dataSource.patients
-        .where((p) =>
-            p.id.toLowerCase().contains(lowerCaseQuery) ||
-            p.name.toLowerCase().contains(lowerCaseQuery) ||
-            p.contact.contains(query))
+        .where(
+          (p) =>
+              p.name.toLowerCase().contains(lower) ||
+              p.contact.toLowerCase().contains(lower) ||
+              p.id.toLowerCase().contains(lower),
+        )
         .toList();
   }
 

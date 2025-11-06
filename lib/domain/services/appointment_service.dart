@@ -10,24 +10,31 @@ class AppointmentService {
   final StaffRepository staffRepository;
   final PatientRepository patientRepository;
 
-
-  AppointmentService(this.appointmentRepository, this.staffRepository,this.patientRepository);
+  AppointmentService(
+    this.appointmentRepository,
+    this.staffRepository,
+    this.patientRepository,
+  );
 
   Appointment bookAppointment(
     String patientId,
     String doctorId,
     DateTime dateTime,
   ) {
+    if (dateTime.isBefore(DateTime.now())) {
+      throw Exception('Cannot book an appointment in the past');
+    }
+
     final existingAppointments = appointmentRepository.getByDoctorAndDate(
       doctorId,
       dateTime,
     );
     if (existingAppointments.any((appt) => appt.dateTime == dateTime)) {
-      throw Exception('Time slot is already booked.');
+      throw Exception('Doctor already has an appointment at this time');
     }
 
     final doctor = staffRepository.getById(doctorId);
-    final patient = patientRepository.getById(doctorId);
+    final patient = patientRepository.getById(patientId);
 
     if (doctor == null || doctor.role != Role.doctor) {
       throw Exception('Invalid Doctor ID.');
@@ -36,7 +43,6 @@ class AppointmentService {
     if (patient == null) {
       throw Exception('Patient not found.');
     }
-    
 
     final newAppointment = Appointment(
       id: IdGenerator.generate(),

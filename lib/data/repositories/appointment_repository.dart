@@ -34,7 +34,7 @@ class AppointmentRepository {
   }
 
   List<Appointment> getByDoctor(String doctorId) {
-    return dataSource.appointments.where((a) => a.doctor == doctorId).toList();
+    return dataSource.appointments.where((a) => a.doctor.id == doctorId).toList();
   }
 
   void update(Appointment a) {
