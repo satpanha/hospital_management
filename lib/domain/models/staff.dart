@@ -20,6 +20,7 @@ class Staff extends Person {
     required this.password,
   });
 
+  @override
   Map<String, dynamic> toJson() {
     return {
       'id': id,
@@ -50,8 +51,7 @@ class Staff extends Person {
     );
   }
   
-  @override
-  String toString() {
+  @override  String toString() {
     return '${super.toString()}, Role: $role, '
         'Specialization: $specialization, Availability: $availability, '
         'Contact: $contact, Address: $address';

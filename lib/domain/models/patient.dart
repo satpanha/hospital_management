@@ -11,6 +11,7 @@ class Patient extends Person {
     required super.address,
   });
 
+  @override
   Map<String, dynamic> toJson() {
     return {
       'id': id,

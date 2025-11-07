@@ -106,7 +106,9 @@ class StaffUI {
     }
 
     print('\n--- Search Results ---');
-    staffList.forEach((s) => print(s));
+    for (var s in staffList) {
+      print(s);
+    }
   }
 
   void listAllStaff() {
@@ -117,7 +119,9 @@ class StaffUI {
       return;
     }
     print('\n--- All Staff ---');
-    staffList.forEach((s) => print(s));
+    for (var s in staffList) {
+      print(s);
+    }
   }
 
   void updateStaff() {
